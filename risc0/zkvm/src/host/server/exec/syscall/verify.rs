@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use anyhow::{anyhow, Result};
-use risc0_circuit_rv32im::prove::emu::addr::ByteAddr;
+use risc0_binfmt::ByteAddr;
 use risc0_zkvm_platform::syscall::reg_abi::{REG_A3, REG_A4};
 
 use crate::sha::{Digest, DIGEST_BYTES};
@@ -57,7 +57,8 @@ impl Syscall for SysVerify {
         // Mark the assumption as accessed, pushing it to the head of the list, and return the success code.
         ctx.syscall_table()
             .assumptions_used
-            .borrow_mut()
+            .lock()
+            .unwrap()
             .insert(0, assumption);
 
         let metric = &mut ctx.syscall_table().metrics.borrow_mut()[SyscallKind::VerifyIntegrity];
